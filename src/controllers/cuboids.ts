@@ -60,13 +60,17 @@ export const update = async (
   const id = req.params.id as Id;
   const { newWidth, newHeight, newDepth } = req.body;
 
-  const cuboid = await Cuboid.query().findById(id).withGraphFetched('bag.[cuboids]');
+  const cuboid = await Cuboid.query()
+    .findById(id)
+    .withGraphFetched('bag.[cuboids]');
 
   if (!cuboid) {
-    return res.status(HttpStatus.NOT_FOUND).json({ message: 'Cuboid not found' });
+    return res
+      .status(HttpStatus.NOT_FOUND)
+      .json({ message: 'Cuboid not found' });
   }
 
-  if (cuboid.bag.availableVolume < (newWidth * newHeight * newDepth)) {
+  if (cuboid.bag.availableVolume < newWidth * newHeight * newDepth) {
     return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({
       message: 'Insufficient capacity in bag',
     });
@@ -77,7 +81,8 @@ export const update = async (
       width: newWidth,
       height: newHeight,
       depth: newDepth,
-    }).withGraphFetched('bag');
+    })
+    .withGraphFetched('bag');
 
   return res.status(HttpStatus.OK).json(updatedCuboid);
 };
@@ -91,7 +96,9 @@ export const deleteCuboid = async (
   const cuboid = await Cuboid.query().findById(id);
 
   if (!cuboid) {
-    return res.status(HttpStatus.NOT_FOUND).json({ message: 'Cuboid not found' });
+    return res
+      .status(HttpStatus.NOT_FOUND)
+      .json({ message: 'Cuboid not found' });
   }
 
   await Cuboid.query().deleteById(id);
